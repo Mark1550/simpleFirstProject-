@@ -1,0 +1,102 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="./Style.css"> <!--Link to the .css file. -->
+</head>
+
+<body onload="showStudent()">
+    <ul class="background">
+        <h1>Wellcome</h1>
+        <div id="div"></div>
+        <div style="margin: auto;">
+            <button onclick="backToMAin()">Back to main page</button>
+        </div>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+</body>
+<script>
+    const URL_PATH = "http://localhost:1550/studentsdbs"
+    const showStudent = async () => { // Function that loads all the students info
+        const response = await fetch(`${URL_PATH}/${sessionStorage.getItem('idstudent')}`);
+        if (response.ok) {
+            const student = await response.json();
+            const div = document.getElementById('div')
+            div.innerHTML = ""; //clear the div so it will start empty every time.
+
+            const nametxt = document.createElement('h2')         //
+            const emailtxt = document.createElement('h2')       //
+            const facultytxt = document.createElement('h2')    // Creating the headers for the info.
+            const birthdatetxt = document.createElement('h2') //
+            const graadestxt = document.createElement('h2')  //
+
+            nametxt.innerText = `Full Name: ${student.fullName}`;                                       //
+            emailtxt.innerText = `Email: ${student.email}`;                                            //
+            facultytxt.innerText = `Faculty: ${student.faculty}`;                                     //
+            const showDate = new Date(student.birthDate)                                             // Printing the info to the headers
+            const newDate = `${showDate.getDate()}/${showDate.getMonth()+1}/${showDate.getFullYear()}`// 
+            birthdatetxt.innerText = `Birth Date: ${newDate}`;                                     //
+            graadestxt.innerText = "Exams Table:"                                                 //
+
+            div.appendChild(nametxt);        //
+            div.appendChild(emailtxt);      //
+            div.appendChild(facultytxt);   // appendchild all the headers to the div in the page.
+            div.appendChild(birthdatetxt);//
+            div.appendChild(graadestxt); //
+
+            const table = document.createElement('table')   //
+            const firstTr = document.createElement('tr')   //
+            const nameTh = document.createElement('th')   // creating the headers and the first row and the table for the exams info
+            const dateTh = document.createElement('th')  //
+            const gradeTh = document.createElement('th')//
+
+            nameTh.innerText = "Name"    // 
+            dateTh.innerText = "Date"   // Setting the innerText for the headers.
+            gradeTh.innerText = "Grade"// 
+
+            firstTr.appendChild(nameTh)   //
+            firstTr.appendChild(dateTh)  // appendchild the first row and the headers to the table.
+            firstTr.appendChild(gradeTh)// 
+            table.appendChild(firstTr) //
+
+            student.grades.forEach(grade => { //Using the "forEach" method to go through all the exams and print them in the table.
+                const newTr = document.createElement('tr')     //
+                const nameTd = document.createElement('td')   // Creating the td's and a new row for the info.
+                const dateTd = document.createElement('td')  // 
+                const gradeTd = document.createElement('td')//
+
+                const tempDate = new Date(grade.date)
+                const newDate = `${tempDate.getDate()}/${tempDate.getMonth()+1}/${tempDate.getFullYear()}`// Setting the dates of the exams in the correct format.
+
+                nameTd.innerText = grade.name;    //
+                dateTd.innerText = newDate;      // Setting all the exams info in the td's
+                gradeTd.innerText = grade.grade;//
+
+                newTr.appendChild(nameTd)   //
+                newTr.appendChild(dateTd)  // appendchild the td's and the new row to the table.
+                newTr.appendChild(gradeTd)//
+                table.appendChild(newTr) //
+            });
+            div.appendChild(table) // appendchild the table to the div in the page.
+        }
+    }
+    const backToMAin = () => { //"backToMain" is a function that works when the coresponding button is pressed and it redirects the client back to the main page.
+        window.location.href = "file:///C:/Users/marks/Documents/FullStack/Project%201/Client/mainPage.html"  // Redirecting back to the main page.
+    }
+</script>
+
+</html>

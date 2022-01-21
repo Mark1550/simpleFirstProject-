@@ -1,0 +1,136 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="./Style.css"> <!--Link to the .css file. -->
+
+</head>
+
+<body onload="showTable()">
+    <ul class="background">
+        <h1>Welcome To The Students Page</h1>
+        <table id="table" style="margin: auto;">
+        </table><br>
+        <div style="margin: auto;">
+            <button style="background-color: chocolate;color: cornsilk;width: 60px;height:40px ;" onclick="addStudent()">Add Student</button>
+        </div>        
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+</body>
+<script>
+    const URL_PATH = "http://localhost:1550/studentsdbs"
+    const showTable = async () => {     //"showTable" is a function that works every time the page loads and it shows the table with the students.
+        const response = await fetch(URL_PATH);
+        const table = document.getElementById('table')//Getting the table from the page.
+        table.innerHTML = "";  // Clearing the table so it will be empty every time it loads.
+        if (response.ok) {
+            const studets = await response.json();
+
+            const firstTr = document.createElement('tr')       //
+            const nameTh = document.createElement('th')       //
+            const facultyTh = document.createElement('th')   // Creating the first row and the headers in the table.
+            const gradesTh = document.createElement('th')   //
+            const editTh = document.createElement('th')    //
+            const deleteTh = document.createElement('th') //
+
+            nameTh.innerText = "Name"        // 
+            facultyTh.innerText = "Faculty" // 
+            gradesTh.innerText = "Exams"   // Writing the innerText for the headers. 
+            editTh.innerText = "Edit"     // 
+            deleteTh.innerText = "Delete"// 
+
+            firstTr.appendChild(nameTh);      //
+            firstTr.appendChild(facultyTh);  //
+            firstTr.appendChild(gradesTh);  // appendchild the headers to the first row and the first row to the table.
+            firstTr.appendChild(editTh);   //
+            firstTr.appendChild(deleteTh);//
+            table.appendChild(firstTr);  //
+
+            studets.map((student) => {   // Using map to go through all the students and print the nin the table.
+                const newTr = document.createElement('tr')        //
+                const nameTd = document.createElement('td')      //
+                const facultyTd = document.createElement('td')  // Creating all the neccesery td's and a new row.
+                const gradesTd = document.createElement('td')  //
+                const editTd = document.createElement('td')   //
+                const deleteTd = document.createElement('td')//
+                nameTd.innerText = student.fullName;                            //
+                facultyTd.innerText = student.faculty;                         //
+                gradesTd.innerText = "Exams";                                 // Insering all the info and making the name and the exams clickable
+                gradesTd.value = student._id;                                //  so it will redirect the client to the corseponig page.
+                gradesTd.setAttribute('onclick', 'RedirectToGrades(value)') //
+                nameTd.value = student._id                                 //
+                nameTd.setAttribute('onclick', 'RedirectToStudent(value)')//
+
+                let editbtn = document.createElement('button')                  //
+                editbtn.innerText = "Update"                                   // 
+                editbtn.value = student._id                                   //
+                editbtn.style.backgroundColor = "yellow"                     // Setting up the button to edit a student.
+                editbtn.style.color = "black"                               // 
+                editbtn.style.width = "100%"                               //
+                editbtn.style.height = "100%"                             // 
+                editbtn.setAttribute('onclick', 'RedirectToEdit(value)');//
+                editTd.appendChild(editbtn)                             //
+                
+                let deletebtn = document.createElement('button')         //
+                deletebtn.innerText = "X"                               // 
+                deletebtn.value = student._id                          // 
+                deletebtn.style.backgroundColor = "crimson"           // Setting up the button to delete a student.
+                deletebtn.style.width = "100%"                       // 
+                deletebtn.style.height = "100%"                     // 
+                deletebtn.setAttribute('onclick', 'Delete(value)');//
+                deleteTd.appendChild(deletebtn)                   //
+
+                newTr.appendChild(nameTd)      //
+                newTr.appendChild(facultyTd)  //
+                newTr.appendChild(gradesTd)  // appendchild all the td's and the row to the table.
+                newTr.appendChild(editTd)   //
+                newTr.appendChild(deleteTd)//
+                table.appendChild(newTr)  //
+            })
+        }
+    }
+
+    const RedirectToStudent = async (id) => {// Function that redirects the client to the student page.
+        sessionStorage.setItem("idstudent", id)
+        window.location.href = "file:///C:/Users/marks/Documents/FullStack/Project%201/Client/studentPage.html"
+    }
+
+    const RedirectToEdit = async (id) => {// Funciton that redirects the client to the edit page.
+        sessionStorage.setItem("idEdit", id)
+        window.location.href = "file:///C:/Users/marks/Documents/FullStack/Project%201/Client/editStudentPage.html"
+    }
+
+    const RedirectToGrades = async (id) => {// Funciton that redirects the client to the grades page.
+        sessionStorage.setItem("idgrades", id)
+        window.location.href = "file:///C:/Users/marks/Documents/FullStack/Project%201/Client/gradesPage.html"
+    }
+
+    const Delete = async (id) => {  //Function that deletes the student by id.
+        const response = await fetch(`${URL_PATH}/${id}`, { method: 'delete' })
+        if (response.ok) {                      //
+            const data = await response.json();// Printing the response in case there was an error
+            console.log(data);                //
+        }
+        showTable();
+    }
+    const addStudent = async () => { // Function that redirects the client to the add a student page.
+        window.location.href = "file:///C:/Users/marks/Documents/FullStack/Project%201/Client/addStudentPage.html"
+    }
+
+</script>
+
+</html>

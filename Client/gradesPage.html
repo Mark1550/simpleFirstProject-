@@ -1,0 +1,216 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="./Style.css"> <!--Link to the .css file. -->
+</head>
+
+<body onload="showStudent()">
+    <ul class="background">
+        <h1 id="htxt"></h1>
+        <div id="div"></div>         <!--in this div the table with the grades will be displayed. -->
+        <div style="margin: auto;"><button onclick="addGrade()">Add Exam</button>
+            <button onclick="backToMain()">Back to main page</button>
+        </div>
+        <div id="updateDiv" style="display: none;">
+            <label for="date">Name: </label><br><input type="text" id="name"><br>
+            <label for="date">Date: </label><br><input type="date" id="date"><br>     <!--This is the div with the inputs that will be "Openned" when the client will want to update an exam.-->
+            <label for="grade">Grade: </label><br><input type="text" id="grade"><br>
+            <button id="updatebtn" onclick="update()">Update</button>
+        </div>
+        <div id="addDiv" style="display: none;">
+            <label for="addname">Name: </label><br><input type="text" id="addname"><br>
+            <label for="adddate">Date: </label><br><input type="date" id="adddate"><br>  <!--this is the div with the inputs that will open  when the cllient will want to add an exam.-->
+            <label for="addgrade">Grade: </label><br><input type="text" id="addgrade"><br>
+            <button id="addbtn" onclick="Add()">Add</button>
+        </div>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+</body>
+<script>
+    const URL_PATH = "http://localhost:1550/studentsdbs"
+    const showStudent = async () => { // "showStudent" is a function that loads the student Exams info in the table on the page for the client to view and change them.
+        const response = await fetch(`${URL_PATH}/${sessionStorage.getItem('idgrades')}`);
+        if (response.ok) {
+            const student = await response.json();
+
+            const div = document.getElementById('div')  // getting the div from the page to appendchild the table with the exams to it.
+            div.innerHTML = ""                          // clearing the div so every time the page is refreshed the div wouldn't add to itself another table.
+            const table = document.createElement('table')      //
+            const firstTr = document.createElement('tr')      //
+            const nameTh = document.createElement('th')      //
+            const dateTh = document.createElement('th')     // Creating table, first row and headers.
+            const gradeTh = document.createElement('th')   //
+            const updateTh = document.createElement('th') //
+            const deleteTh = document.createElement('th')//
+
+            updateTh.innerText = "Update"  //
+            deleteTh.innerText = "Delete" // 
+            nameTh.innerText = "Name"    // Setting the innerText for the headers.
+            dateTh.innerText = "Date"   // 
+            gradeTh.innerText = "Grade"//
+
+            firstTr.appendChild(nameTh)        //
+            firstTr.appendChild(dateTh)       //
+            firstTr.appendChild(gradeTh)     //
+            firstTr.appendChild(updateTh)   // appendchild the headers to the first row and the first row to the table.
+            firstTr.appendChild(deleteTh)  //
+            table.appendChild(firstTr)    //
+            let index = 0;        // index is the place of the exam in the exmas array of the student, it is used to edit or delete each exam leter.
+            student.grades.forEach(grade => {//using the "forEach" to go through all the exams and display them in the table.
+                const newTr = document.createElement('tr')        //
+                const nameTd = document.createElement('td')      //
+                const dateTd = document.createElement('td')     // Creating a row and all the neccesery td's
+                const gradeTd = document.createElement('td')   //
+                const updateTd = document.createElement('td') //
+                const deleteTd = document.createElement('td')//
+
+                let editbtn = document.createElement('button')             //
+                editbtn.innerText = "Update"                              // 
+                editbtn.value = index                                    // 
+                editbtn.style.backgroundColor = "yellow"                //Setting up the "edit" button's value to the index so evry time it's clicked
+                editbtn.style.width = "100%"                           // the program knows what exam the client want to edit.
+                editbtn.style.height = "100%"                         // 
+                editbtn.setAttribute('onclick', 'updategrade(value)')//
+                updateTd.appendChild(editbtn)                       // appendchild the button to the td.
+
+                let deletebtn = document.createElement('button')               //
+                deletebtn.innerText = "X"                                     //
+                deletebtn.value = index                                      //
+                deletebtn.style.backgroundColor = "red"                     // 
+                deletebtn.style.width = "100%"                             // Setting up the "dlete" button's value to the index so evry time it's clicked
+                deletebtn.style.height = "100%"                           //  the program knows what exam the client want to delete.
+                deletebtn.style.color = "white"                          // 
+                deletebtn.setAttribute('onclick', 'deleteGrade(value)') //
+                deleteTd.appendChild(deletebtn)                        // appendchild the button to the td.
+
+                nameTd.innerText = grade.name;   //
+                gradeTd.innerText = grade.grade;// Displaying the exam info in the td's
+                showDate = new Date(grade.date)//
+                const newDate = `${showDate.getDate()}/${showDate.getMonth() + 1}/${showDate.getFullYear()}`//Changing the date into a comfortable format.
+                dateTd.innerText = newDate;// Displaying the exam date in the comfortable format in the td's.
+                newTr.appendChild(nameTd)      //
+                newTr.appendChild(dateTd)     //
+                newTr.appendChild(gradeTd)   // appendchild all the td's to the new row.
+                newTr.appendChild(updateTd) //
+                newTr.appendChild(deleteTd)//
+                table.appendChild(newTr)  //
+                index++; //increaing the "index" by 1.
+            })
+            div.appendChild(table) //appendchild the table to the div in the page.
+            h = document.getElementById('htxt') //Getting the page header by it's id.
+            h.innerText = `Here are ${student.fullName}'s Exams` //Displying the name of the student at the top of the page.
+        }
+    }
+    const updategrade = async (index) => { //"updategrade" is a function that works when the edit button near an exam is clicked and it shows the update div where there is all the info of the exam.
+        document.getElementById("updateDiv").style.display = "block" //Displaying the update div.
+        document.getElementById('addDiv').style.display = "none"     // Hiding the add div.
+        const response = await fetch(`${URL_PATH}/${sessionStorage.getItem('idgrades')}`);
+        if (response.ok) {                                                                                           //
+            const student = await response.json();                                                                  //
+            document.getElementById('name').value = student.grades[index].name                                     //
+            document.getElementById('grade').value = student.grades[index].grade                                  //
+            const tempDate = new Date(student.grades[index].date)                                                // Showing all the info of the exam in the inputs of the Div.
+            var month = 0, day = 0;                                                                             //
+            tempDate.getMonth() < 10 ? month = `0${tempDate.getMonth() + 1}` : month = tempDate.getMonth() + 1 //Changing the time to the correct format 
+            tempDate.getDate() < 10 ? day = `0${tempDate.getDate()}` : day = tempDate.getDate()               // so it will work with the input.
+            const finalDate = `${tempDate.getFullYear()}-${month}-${day}`                                    //
+            document.getElementById('date').value = finalDate                                               //
+        }
+        document.getElementById('updatebtn').value = index;//Setting the update button value to the index of the exam so the program will know which exam to update.
+    }
+
+    const update = async () => { //"update" is a function that works when the update button is clicked and it updated the exam acccording to the client inputs.
+        const index = document.getElementById('updatebtn').value //Getting the exam index from the button.
+        const response = await fetch(`${URL_PATH}/${sessionStorage.getItem('idgrades')}`);
+        if (response.ok) {
+            const student = await response.json();
+            student.grades[index].name = document.getElementById('name').value;           //
+            student.grades[index].grade = document.getElementById('grade').value;        // Setting up the new exam info in the student info.
+            student.grades[index].date = document.getElementById('date').value;         //
+
+            const response1 = await fetch(`${URL_PATH}/${sessionStorage.getItem('idgrades')}`, {//
+                method: 'put',                                                                 //
+                headers: { 'content-Type': 'application/json' },                              // Using the "put" method to update the student in the database.
+                body: JSON.stringify(student)                                                //
+            })                                                                              //
+            if (response1.ok) {                      //
+                const data = await response1.json();// Printing the response in case there was an error.
+                console.log(data);                 //
+            }
+            document.getElementById("updateDiv").style.display = "none" // Hiding the update div after the update is done.
+            showStudent(); // Showing the updated table of exams.
+        }
+    }
+
+    const deleteGrade = async (index) => { // "deleteGrade" is a function that delete an exam using the index to find it.
+        const response = await fetch(`${URL_PATH}/${sessionStorage.getItem('idgrades')}`);
+        if (response.ok) {
+            const student = await response.json()
+            student.grades.splice(index, 1) //Deleting the exam using the "spilce" method
+            const response1 = await fetch(`${URL_PATH}/${sessionStorage.getItem('idgrades')}`, {//
+                method: 'put',                                                                 //
+                headers: { 'content-Type': 'application/json' },                              // Using the "put" method to update the student in the database.
+                body: JSON.stringify(student)                                                //
+            })                                                                              //
+            if (response1.ok) {                      //
+                const data = await response1.json();// Printing the response in case there was an error.
+                console.log(data);                 //
+            }
+        }
+        showStudent(); // Showing the updated table of exams.
+    }
+
+    const addGrade = async () => { //"addGrade" is a function that works when the "Add exam" button is clicked and it will show the add div with all the needed input areas to add an exam.
+        document.getElementById('addDiv').style.display = "block" //Showing the add div.
+        document.getElementById('updateDiv').style.display = "none" // Hiding the update div.
+    }
+
+    const Add = async () => {  //"Add" is a function that works when the "Add" button is clicked, the function takes all the input values from the client and making a new exam object in the database.
+        const response = await fetch(`${URL_PATH}/${sessionStorage.getItem('idgrades')}`);
+        const addName = document.getElementById('addname').value
+        const addDate = document.getElementById('adddate').value
+        const addGrade = document.getElementById('addgrade').value
+        const newGrade = {     //
+            name: addName,    //
+            date: addDate,   // Making a new exam object 
+            grade: addGrade //
+        }                  //
+        if (response.ok) {
+            const student = await response.json();
+            student.grades.push(newGrade) //Adding the new exam object to student's grades array using the "push" method.
+            const response1 = await fetch(`${URL_PATH}/${sessionStorage.getItem('idgrades')}`, {//
+                method: 'put',                                                                 //
+                headers: { 'content-Type': 'application/json' },                              // Updating the student in the database with the new exam object.
+                body: JSON.stringify(student)                                                //
+            })                                                                              //
+            if (response1.ok) {                      //
+                const data = await response1.json();// Printing the response in case there was an error.
+                console.log(data);                 //
+            }
+            document.getElementById('addDiv').style.display = "none" // Hiding the add div after the work is complitted.
+            showStudent();// Showing the updated table of exams.
+        }
+    }
+    const backToMain = () => {//"backToMain" is a function that works when the coresponding button is pressed and it redirects the client back to the main page.
+        window.location.href = "file:///C:/Users/marks/Documents/FullStack/Project%201/Client/mainPage.html"  // Redirecting back to the main page.
+    }
+</script>
+
+</html>

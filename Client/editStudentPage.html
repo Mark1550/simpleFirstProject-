@@ -1,0 +1,80 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="./Style.css"> <!--Link to the .css file. -->
+</head>
+
+<body onload="loadStudent()">
+    <ul class="background">
+        <div id="EditDiv" style="margin: auto;">
+            <h3 id="h3"></h3>
+            <label for="name">Full Name: </label><br><input type="text" id="name"><br>
+            <label for="email">Email: </label><br><input type="text" id="email"><br>
+            <label for="faculty">Faculty: </label><br><input type="text" id="faculty"><br>
+            <label for="birthDate">Birth Date</label><br><input type="date" id="birthDate"><br><br>
+            <button id="addbtn" onclick="update()">Edit</button>
+            <button onclick="backToMain()">Back to main page</button>
+        </div>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+
+</body>
+<script>
+    const URL_PATH = "http://localhost:1550/studentsdbs"
+    const id = sessionStorage.getItem('idEdit')  // Getting the id of the student that we ant to edit from the session storage.
+
+    const loadStudent = async () => {  // "loadStudent" is a function that loads the student info in the inputs on the page for the client to change them.
+        const response = await fetch(`${URL_PATH}/${id}`);
+        if (response.ok) {
+            const student = await response.json();
+            document.getElementById('h3').innerText = `Update ${student.fullName}'s Info`                           //
+            document.getElementById('name').value = student.fullName                                               //
+            document.getElementById('email').value = student.email                                                //
+            document.getElementById('faculty').value = student.faculty                                           //
+            const tempDate = new Date(student.birthDate)                                                        //
+            var month = 0,day=0;                                                                               // Changing all the inputs in the page for the student's info.
+            tempDate.getMonth() < 10 ? month = `0${tempDate.getMonth() + 1}` : month = tempDate.getMonth() + 1//
+            tempDate.getDate() < 10 ? day = `0${tempDate.getDate()}` : day = tempDate.getDate()              // Changing the student's birthday value so it will work with the "DATE" format.
+            const finalDate = `${tempDate.getFullYear()}-${month}-${day}`                                   //
+            document.getElementById('birthDate').value = finalDate                                         //
+        }
+    }
+    const update = async () => {  // "Update" iis function that works when the "Edit" button is pressed and it takes all the values from the inputs on the page, creating a new student ibject with the updated info and updating the object in the database.
+        const response = await fetch(`${URL_PATH}/${id}`);
+        if (response.ok) {
+            const student = await response.json();                            //
+            student.fullName = document.getElementById('name').value         //
+            student.email = document.getElementById('email').value          // Getting all the info from the inputs on the page and declering them in the student's keys.
+            student.faculty = document.getElementById('faculty').value     //
+            student.Birthdate = document.getElementById('birthDate').value//
+
+            const response1 = await fetch(`${URL_PATH}/${id}`, {   //
+                method: 'put',                                    //
+                headers: { 'content-Type': 'application/json' }, // Using the "Put" method to update the object using it's id.
+                body: JSON.stringify(student)                   //
+            })                                                 //
+            if (response1.ok) {                       //
+                const data = await response1.json(); // Printing the response in case there was an error.
+                console.log(data);                  //
+            }
+            window.location.href = "file:///C:/Users/marks/Documents/FullStack/Project%201/Client/mainPage.html" // Redirecting back to the main page.
+        } 
+    }
+    const backToMain = () => {//"backToMain" is a function that works when the coresponding button is pressed and it redirects the client back to the main page.
+        window.location.href = "file:///C:/Users/marks/Documents/FullStack/Project%201/Client/mainPage.html"    // Redirecting back to the main page.
+    }
+</script>
+
+</html>

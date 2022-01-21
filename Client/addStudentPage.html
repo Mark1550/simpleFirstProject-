@@ -1,0 +1,65 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="./Style.css">  <!--Link to the .css file. -->
+</head>
+
+<body>
+    <ul class="background">
+        <div id="EditDiv" style="margin: auto;">
+            <h3 id="h3">Add New Student</h3>
+            <label for="name">Full Name: </label><br><input type="text" id="name"><br>
+            <label for="email">Email: </label><br><input type="text" id="email"><br>
+            <label for="faculty">Faculty: </label><br><input type="text" id="faculty"><br>
+            <label for="birthDate">Birth Date</label><br><input type="date" id="birthDate"><br><br>
+            <button id="addbtn" onclick="Add()">Add Student</button>
+            <button onclick="backToMain()">Back to main page</button>
+        </div>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+</body>
+<script>
+    const URL_PATH = "http://localhost:1550/studentsdbs"
+
+    const Add = async () => {    //"Add" is a function that takes the values from the page inputs add creating another Student object in the DataBase.
+        const showDate = new Date(document.getElementById('birthDate').value)
+        const newStudent = {                                        //
+            fullName: document.getElementById('name').value,       //
+            email: document.getElementById('email').value,        //
+            faculty: document.getElementById('faculty').value,   // Creating new student object.
+            birthDate: showDate                                 //
+        }                                                      //
+        const response = await fetch(URL_PATH, {                  //
+            method: 'post',                                      //
+            headers: { 'content-Type': 'application/json' },    // Using the "post" method to add the object to the database.
+            body: JSON.stringify(newStudent)                   //
+        })                                                    //
+        if (response.ok) {                                      //
+            const data = await response.json();                // Printing the response in case there was an error.
+            console.log(data);                                //
+        }
+        window.location.href = "file:///C:/Users/marks/Documents/FullStack/Project%201/Client/mainPage.html"  // Redirecting back to the main page.
+    }
+    const backToMain = () => {//"backToMain" is a function that works when the coresponding button is pressed and it redirects the client back to the main page.
+        window.location.href = "file:///C:/Users/marks/Documents/FullStack/Project%201/Client/mainPage.html"  // Redirecting back to the main page.
+    }
+
+</script>
+
+</html>
