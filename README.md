@@ -1,4 +1,4 @@
-# simpleFirstProject-
+# Simple First Project-
 My first project that i have made in the Full-Stack course
 
 This is a simple students managment website, where you can see, add, update
